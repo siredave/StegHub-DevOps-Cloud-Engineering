@@ -121,14 +121,147 @@ ___
 
 
 ## **Step 2 - Installing MySQL**   
-MySQL: The relational database management system (RDBMS) used for storing and managing data in the web application. MySQL is known for its reliability, scalability, and performance, making it a popular choice for web developers.   
-1. Acquire and install this software using:
+**MySQL: The relational database management system (RDBMS) used for storing and managing data in the web application. MySQL is known for its reliability, scalability, and performance, making it a popular choice for web developers.**   
+
+1. **Acquire and install this software using:**
    
    ```sudo apt install mysql-server```
 
    ![](./images/Screenshot%202024-05-23%20011407.png)
 
+2. **Enable and verify that mysql is running using the command:**
 
-2. When installation is finished, log in to the MySQL console by typing :   
+```sudo systemctl status mysql```     
+  ![](./images/Screenshot%202024-05-23%20142718.png)
+
+3. **When installation is finished, log in to the MySQL console by typing :**   
 ```sudo mysql```
+
+   This connects to the MySQL server as the administrative database user root infered by the use of sudo when running the command.
+   
 ![](./images/Screenshot%202024-05-23%20011456.png)
+   
+   4. **Set a password for root user using mysql_native_password as default authentication method.**    
+
+
+   ```ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Admin.1```
+
+   5. **Run an Interactive script to secure MySQL**
+
+The security script comes pre-installed with mysql. This script removes some insecure settings and lock down access to the database system.
+
+```sudo mysql_secure_installation```  
+![](./images/Screenshot%202024-05-23%20143744.png)    
+
+6. **After changing root user password, log in to MySQL console.**
+
+A command prompt for password was noticed after running the command below.
+
+```sudo mysql -p```
+
+![](./images/Screenshot%202024-05-23%20144120.png)   
+
+Exit MySQL shell
+
+```exit```
+
+
+## Step 3 - Install PHP   
+1. Install php Apache is installed to serve the content and MySQL is installed to store and manage data. PHP is the component of the set up that processes code to display dynamic content to the end user.
+
+The following were installed:
+
+* php package  
+
+* php-mysql, a PHP module that allows PHP to communicate with MySQL-based databases.  
+
+* libapache2-mod-php, to enable Apache to handle PHP files.
+sudo apt install php libapache2-mod-php php-mysqls11  
+
+```sudo apt install php libapache2-mod-php php-mysql```
+
+![](./images/Screenshot%202024-05-23%20155820.png)
+
+2. Confirm the PHP version
+
+```php -v```
+![](./images/Screenshot%202024-05-23%20154954.png)
+
+At this point, the LAMP stack is completely installed and fully operational.
+   
+   ### To test the set up with a PHP script, it's best to set up a proper Apache Virtual Host to hold the website files and folders. Virtual host allows to have multiple websites located on a single machine and it won't be noticed by the website users.
+___  
+
+
+## **Step 4 - Create a virtual host for the website using Apache**
+1. **The default directory serving the apache default page is /var/www/html. Create your document directory next to the default one.**
+
+Created the directory for projectlamp using "mkdir" command
+
+```sudo mkdir /var/www/projectlamp```   
+
+Assign the directory ownership with $USER environment variable which references the current system user.
+
+```sudo chown -R $USER:$USER /var/www/projectlamp1``` 
+
+  
+  Create and open a new configuration file in apache’s “sites-available” directory using vim.
+
+```sudo vim /etc/apache2/sites-available/projectlamp.conf```  
+
+![](./images/Screenshot%202024-05-23%20173134.png)
+
+
+Past in the bare-bones configuration below by hitting on ```i```:    
+
+
+`<VirtualHost *:80>
+  ServerName projectlamp
+  ServerAlias www.projectlamp
+  ServerAdmin webmaster@localhost
+  DocumentRoot /var/www/projectlamp
+  ErrorLog ${APACHE_LOG_DIR}/error.log
+  CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>`
+
+hit the `esc` button on the keyboard, type `:` , type `wq.` for **w** and `q` for quit hit `ENTER`  to save the file.
+  
+
+
+ **Show the new file in sites-available**
+
+```sudo ls /etc/apache2/sites-available```
+
+![](./images/Screenshot%202024-05-23%20180558.png)    
+
+With the VirtualHost configuration, Apache will serve projectlamp using /var/www/projectlamp1 as its web root directory.     
+
+ **Enable the new virtual host**
+
+```sudo a2ensite projectlamp1```  
+![](./images/Screenshot%202024-05-23%20180633.png)
+
+ **Disable apache’s default website.**
+
+This is because Apache’s default configuration will overwrite the virtual host if not disabled. This is required if a custom domain is not being used.
+
+```sudo a2dissite 000-default```
+![](./images/Screenshot%202024-05-23%20180700.png)  
+
+ **Ensure the configuration does not contain syntax error:**
+
+```sudo apache2ctl configtest```
+
+![](./images/Screenshot%202024-05-23%20181922.png)
+
+Reload apache for changes to take effect.
+
+```sudo systemctl reload apache2```
+
+![]()    
+
+
+ The new website is now active but the web root /var/www/projectlamp is still empty. Create an index.html file in this location so to test the virtual host work as expected.
+
+```sudo echo 'Hello LAMP from hostname' $(curl -s http://16.171.197.144/latest/meta-data/public-hostname) 'with public IP' $(curl -s http://16.171.197.144/latest/meta-data/public-ipv4) > /var/www/projectlamp1/index.html```
+
