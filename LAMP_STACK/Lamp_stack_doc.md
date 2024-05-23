@@ -263,5 +263,15 @@ Reload apache for changes to take effect.
 
  The new website is now active but the web root /var/www/projectlamp is still empty. Create an index.html file in this location so to test the virtual host work as expected.
 
-```sudo echo 'Hello LAMP from hostname' $(curl -s http://16.171.197.144/latest/meta-data/public-hostname) 'with public IP' $(curl -s http://16.171.197.144/latest/meta-data/public-ipv4) > /var/www/projectlamp1/index.html```
+```sudo echo 'Hello LAMP from David' $(curl -s http://169.254.169.254/latest/meta-data/public-hostname) 'with public IP' $(curl -s http://169.254.169.254/latest/meta-data/public-ipv4) > /var/www/projectlamp1/index.html```  
+ and then type  
 
+```sudo systemctl reload apache2```
+
+![](./images/Screenshot%202024-05-23%20185704.png)   
+
+**Open the website on a browser using the public IP address.**
+
+http://16.171.197.144/:80   
+
+![](./images/Screenshot%202024-05-23%20190136.png)
