@@ -275,3 +275,75 @@ Reload apache for changes to take effect.
 http://16.171.197.144/:80   
 
 ![](./images/Screenshot%202024-05-23%20190136.png)
+
+
+  
+  This file can be left in place as a temporary landing page for the application until an index.php file is set up to replace it. Once this is done, the index.html file should be renamed or removed from the document root as it will take precedence over index.php file by default.  
+   
+
+   ## **Step 5 - Enable PHP on the website**  
+
+With the default DirectoryIndex setting on Apache, index.html file will always take precedence over index.php file. This is useful for setting up maintenance page in PHP applications, by creating a temporary index.html file containing an informative message for visitors. The index.html then becomes the landing page for the application. Once maintenance is over, the index.html is renamed or removed from the document root bringing back the regular application page. 
+  
+  If the behaviour needs to be changed, you'll need to edit the  `/etc/apache2/mods-enabled/dir.conf` and change the order in which the index.php file is listed within the DirectoryIndex directive:  
+  1. Open the dir.conf file with vim to change the behaviour
+
+```sudo vim /etc/apache2/mods-enabled/dir.conf```   
+
+```
+ <IfModule mod_dir.c>
+  # Change this:
+  # DirectoryIndex index.html index.cgi index.pl index.php index.xhtml index.htm
+  # To this:
+  DirectoryIndex index.php index.html index.cgi index.pl index.xhtml index.htm
+</IfModule>
+```  
+
+![]()
+
+Save and Exit vim
+
+Press Esc to enter command mode.
+Type `:wq` and press `Enter` to save the changes and exit vim.    
+
+2. Reload Apache
+
+Apache is reloaded so the changes takes effect.
+
+```sudo systemctl reload apache2```
+
+![](./images/Screenshot%202024-05-25%20233931.png)  
+
+
+3. Create a php test script to confirm that Apache is able to handle and process requests for PHP files.  
+
+
+A new index.php file was created inside the custom web root folder.
+
+```vim /var/www/projectlamp1/index.php```  
+
+![](./images/Screenshot%202024-05-25%20233527.png)
+
+Add the text below in the index.php file
+
+```
+<?php
+phpinfo()
+```     
+![](./images/Screenshot%202024-05-25%20225812.png)
+
+4. Now refresh the page
+
+![](./images/Screenshot%202024-05-25%20231029.png)
+
+This page provides information about the server from the perspective of PHP. It is useful for debugging and to ensure the settings are being applied correctly.
+
+After checking the relevant information about the server through this page, It’s best to remove the file created as it contains sensitive information about the PHP environment and the ubuntu server. It can always be recreated if the information is needed later.
+
+```sudo rm /var/www/projectlamp1/index.php```   
+
+### Conclusion:
+
+The LAMP stack provides a robust and flexible platform for developing and deploying web applications. By following the guidelines outlined in this documentation, It was possible to set up, configure, and maintain a LAMP environment effectively, enabling the creation of powerful and scalable web solutions.
+
+
